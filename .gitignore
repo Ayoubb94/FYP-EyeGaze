@@ -1,0 +1,9 @@
+*.pyc
+*.DS_Store
+5_features/
+engineered_data/
+features/
+models/
+plots/
+test_data/
+train_data/
