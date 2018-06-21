@@ -1,4 +1,4 @@
-import os, pandas
+import os, pandas, pdb, glob
 
 def produce_features(FEATURESDIR, panda_fix, panda_sac, name, window_size, overlap):
     # This function should create a new data frame with data divided into 10s windows
@@ -39,3 +39,12 @@ def produce_features(FEATURESDIR, panda_fix, panda_sac, name, window_size, overl
     with open(FEATURESDIR + '/%s_features_%s_%s.csv' % (name[:3], window_size, overlap), 'a+') as f:
         panda_new.to_csv(f, sep='\t', index=False)
 
+
+def combine_features(FEATURESDIR):
+    all_files = glob.glob(os.path.join(FEATURESDIR, "*.csv"))     # advisable to use os.path.join as this makes concatenation OS independent
+    df_from_each_file = (pandas.read_csv(f) for f in all_files)
+    combined_features = pandas.concat(df_from_each_file, ignore_index=True)
+    combined_features.to_csv(os.path.join(FEATURESDIR, "combined_features.csv"), index=False)
+    combined_features = pandas.read_csv(os.path.join(FEATURESDIR, "combined_features.csv"), sep='\t')
+    combined_features = combined_features[pandas.to_numeric(combined_features['avg_distsac'], errors='coerce').notnull()]
+    combined_features.to_csv(os.path.join(FEATURESDIR, "combined_features.csv"), index=False)
